@@ -16,7 +16,7 @@ func CreateForum(forum fmodel.Forum) (fmodel.Forum, error) {
 	conn := utills.GetConnection()
 	var newForum fmodel.Forum
 	user, err := urepo.GetUserByNickname(forum.User_nickname)
-	fmt.Println(user, err)
+	fmt.Println("err when creating forum", err)
 	if err != nil {
 		return fmodel.Forum{}, err
 	}
@@ -43,12 +43,11 @@ func GetThreadsByForumSlug(forumSlug string, isDesc string, limit string, since 
 		return []tmodel.Thread{}, nil, false
 	}
 	if since != "" {
-		fmt.Println(since)
 		layout := "2006-01-02T15:04:05.000Z"
 		t, _ := time.Parse(layout, since)
 		t = t.UTC().Local()
 		tString := "'" + t.String()[:23] + "'"
-		fmt.Println(tString)
+
 		query = `SELECT * from threads where forum=$1 and created<=` + tString + ` ORDER BY created`
 		if isDesc == "false" || isDesc == "" {
 			query = `SELECT * from threads where forum=$1 and created>=` + tString + ` ORDER BY created`
@@ -66,7 +65,7 @@ func GetThreadsByForumSlug(forumSlug string, isDesc string, limit string, since 
 
 func IncrementFieldBySlug(fieldName string, slug string) error {
 	query := fmt.Sprintf(`UPDATE forum SET %s =%s + 1 WHERE slug=$1`, fieldName, fieldName)
-	fmt.Println(query)
+
 	conn := utills.GetConnection()
 	_, err := conn.Exec(query, slug)
 	return err

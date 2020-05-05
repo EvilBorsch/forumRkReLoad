@@ -25,7 +25,7 @@ func AddNew(newThread tm.Thread) (tm.Thread, error) {
 	createdThred.Title = newThread.Title
 	if err == nil {
 		err2 := frepo.IncrementFieldBySlug("threads", newThread.Forum)
-		fmt.Println("new err: ", err2)
+		fmt.Println("err trepo add new ", err2)
 	}
 	return createdThred, err
 
@@ -85,7 +85,7 @@ func IncrementVoteByID(tx *sqlx.Tx, id string, delta int) (tm.Thread, error) {
 func UpdateVoteInVotes(tx *sqlx.Tx, newVote tm.Vote) error {
 	query := `UPDATE votes SET voice =$1 WHERE nickname=$2`
 	_, err := tx.Exec(query, newVote.Voice, newVote.Nickname)
-	fmt.Println("upd: ", err)
+	fmt.Println("err when update: ", err)
 	return err
 }
 
@@ -120,7 +120,7 @@ func InsertNewVoteWithThreadSlug(tx *sqlx.Tx, newVote tm.Vote, slug_or_id string
 
 	query := `INSERT INTO votes (threadid, threadslug, nickname, voice) VALUES ($1,$2,$3,$4)`
 	_, err := tx.Exec(query, nil, slug_or_id, newVote.Nickname, newVote.Voice)
-	fmt.Println(err)
+	fmt.Println("err where insert with thread slug", err)
 }
 
 func getAuthorVotesByThread(tx *sqlx.Tx, thread tm.Thread, nick string) (tm.Vote, error) {
@@ -152,7 +152,7 @@ func MakeVote(slug_or_id string, newVote tm.Vote) (tm.Thread, error) {
 		if err != nil { // не нашли оценки
 			InsertNewVoteWithThreadId(tx, newVote, slug_or_id)
 			incThread, err := IncrementVoteByID(tx, slug_or_id, newVote.Voice)
-			fmt.Println(incThread, err)
+			fmt.Println("err when increment ", err)
 			return incThread, err
 		} //нашли старую оценку
 		delta := newVote.Voice - oldVote.Voice
@@ -172,7 +172,7 @@ func MakeVote(slug_or_id string, newVote tm.Vote) (tm.Thread, error) {
 	if err != nil { // не нашли оценки
 		InsertNewVoteWithThreadSlug(tx, newVote, slug_or_id)
 		incThread, err := IncrementVoteBySlug(tx, slug_or_id, newVote.Voice)
-		fmt.Println(incThread, err)
+		fmt.Println("err when increment bott", err)
 		return incThread, err
 	} //нашли старую оценку
 	delta := newVote.Voice - oldVote.Voice

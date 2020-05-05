@@ -42,18 +42,15 @@ func fetchVote(r *http.Request) (tmodel.Vote, error) {
 func ThreadCreate(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	thread, err := fetchThread(r)
-	fmt.Println("thread: ", thread, err)
 	resultThread, err := trepo.AddNew(thread)
 
-	fmt.Println(resultThread)
 	if err != nil {
-		fmt.Println("err: ", err)
 		if err.Error() == `pq: insert or update on table "threads" violates foreign key constraint "threads_author_fkey"` {
 			utills.SendServerError("not found", http.StatusNotFound, w)
 			return
 		}
 		if err.Error() == `pq: duplicate key value violates unique constraint "threads_slug_key"` {
-			th, _ := trepo.GetThreadBySlugWithoutTx(thread.Slug)
+			th, _ := trepo.GetThreadBySlugWithoutTx(*thread.Slug)
 			utills.SendAnswerWithCode(th, http.StatusConflict, w)
 			return
 		}
@@ -72,7 +69,7 @@ func ThreadVote(w http.ResponseWriter, r *http.Request) {
 	slug_or_id := mux.Vars(r)["slug_or_id"]
 	vote, _ := fetchVote(r)
 	thread, err := trepo.MakeVote(slug_or_id, vote)
-	fmt.Println(thread, err)
+	fmt.Println("err thread vote", err)
 	if err != nil {
 		if err.Error() == "author not found" {
 			errMsg := "Can't find user by nickname: " + vote.Nickname

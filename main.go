@@ -10,6 +10,6 @@ func main() {
 	log.Printf("Server started")
 
 	router := router2.NewRouter()
-
-	log.Println(http.ListenAndServe(":5000", router))
+	log.Println("started 5000")
+	http.ListenAndServe(":5000", router)
 }

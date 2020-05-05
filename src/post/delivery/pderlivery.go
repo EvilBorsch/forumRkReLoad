@@ -23,7 +23,7 @@ import (
 func PostsCreate(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	posts, err := fetchPost(r)
-	fmt.Println(posts, err)
+	fmt.Println("err posts create", err)
 	threadSlug := mux.Vars(r)["slug_or_id"]
 	threadId, isId := utills.IsDigit(threadSlug)
 	var thread tmodel.Thread
@@ -51,7 +51,7 @@ func PostsCreate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	newPosts, err := prepo.AddNewPosts(posts, thread)
-	fmt.Println(err)
+	fmt.Println("err posts create bottom", err)
 	if err != nil {
 		if err.Error() == "no thread" {
 			utills.SendServerError("no thread", http.StatusNotFound, w)
@@ -105,7 +105,7 @@ func GetPosts(w http.ResponseWriter, r *http.Request) {
 	slug_or_id := mux.Vars(r)["slug_or_id"]
 
 	sort := r.FormValue("sort")
-	fmt.Println(limit, sort)
+
 	var posts []pmodel.Post
 	var err error
 	if sort == "" || sort == "flat" {
@@ -173,7 +173,6 @@ func GetSinglePost(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 	}
-	fmt.Println(related, postId)
 
 	retVal := pmodel.PostFull{
 		Post:   post,

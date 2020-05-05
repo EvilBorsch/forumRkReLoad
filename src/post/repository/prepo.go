@@ -73,15 +73,14 @@ func AddNewPosts(posts []pmodel.Post, thr tmodel.Thread) ([]pmodel.Post, error) 
 
 		var newPost pmodel.Post
 		err := tx.Get(&newPost, finalQuery, post.Author, post.Created, post.Forum, post.IsEdited, post.Message, post.Parent, post.Thread)
-		fmt.Println("E:", err, newPost)
-		fmt.Println("new post: ", newPost)
+		fmt.Println("err when add new posts:", err)
 		newPost.Thread = post.Thread //COSTIL todo
 		postList = append(postList, newPost)
 
 	}
 
 	err = UpdateForumPostsCountByThread(tx, thread, len(postList))
-	fmt.Println(postList)
+
 	return postList, err
 }
 
