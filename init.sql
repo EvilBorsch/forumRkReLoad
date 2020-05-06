@@ -97,6 +97,11 @@ create index if not exists slug_id on threads (slug);
 -- --
 --
 --
+create index if not exists slug_id_author on threads (author);
+create index if not exists t_a_f on threads(author,forum);
+
+
+create index if not exists p_id on posts(thread);
 --
 -- create index if not exists path_id_idx on posts (id, (parents [1]));
 -- create index if not exists posts_path_id on posts (parents);

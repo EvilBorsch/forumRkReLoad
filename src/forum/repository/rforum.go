@@ -117,7 +117,7 @@ where ( (threads.forum=$1 or p.forum=$1) `
 func appendUserWhoVote(tx *sqlx.Tx, users []swagger.User, forumSlug string) []swagger.User {
 	query := `Select distinct u.nickname, fullname,about,email
 from votes
-         join threads t on votes.threadSlug = t.slug or votes.threadID=t.id
+         join threads t on votes.threadID=t.id
          join "user" u on t.author = u.nickname
 		 where forum=$1`
 	var usersNew []swagger.User
