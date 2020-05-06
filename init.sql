@@ -102,6 +102,8 @@ create index if not exists t_a_f on threads(author,forum);
 
 
 create index if not exists p_id on posts(thread);
+create index if not exists p_parents on posts(parents);
+create index if not exists p_parent on posts(parent);
 --
 -- create index if not exists path_id_idx on posts (id, (parents [1]));
 -- create index if not exists posts_path_id on posts (parents);
