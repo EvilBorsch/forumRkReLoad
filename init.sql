@@ -91,7 +91,7 @@ CREATE INDEX on votes(nickname,threadID);
 -- --
 -- --
 --
--- create index if not exists slug_id on threads (slug);
+create index if not exists slug_id on threads (slug);
 -- -- create index if not exists f_created_idx on threads (forum, created);
 -- -- create index if not exists t_author_idx on threads (author, forum);
 -- --
