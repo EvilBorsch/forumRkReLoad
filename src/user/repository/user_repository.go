@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"github.com/jmoiron/sqlx"
 	umodel "go-server-server-generated/src/user/models"
 	"go-server-server-generated/src/utills"
 )
@@ -17,6 +18,14 @@ func GetUserByNickname(nickname string) (umodel.User, error) {
 	query := `SELECT * from "user" WHERE nickname=$1`
 	var user umodel.User
 	err := conn.Get(&user, query, nickname)
+	return user, err
+}
+
+func GetUserByNicknameWithTx(tx *sqlx.Tx, nickname string) (umodel.User, error) {
+
+	query := `SELECT * from "user" WHERE nickname=$1`
+	var user umodel.User
+	err := tx.Get(&user, query, nickname)
 	return user, err
 }
 

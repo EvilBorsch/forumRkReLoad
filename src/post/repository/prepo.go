@@ -72,8 +72,7 @@ func AddNewPosts(posts []pmodel.Post, thr tmodel.Thread) ([]pmodel.Post, error) 
 		}
 
 		var newPost pmodel.Post
-		err := tx.Get(&newPost, finalQuery, post.Author, post.Created, post.Forum, post.IsEdited, post.Message, post.Parent, post.Thread)
-		fmt.Println("err when add new posts:", err)
+		tx.Get(&newPost, finalQuery, post.Author, post.Created, post.Forum, post.IsEdited, post.Message, post.Parent, post.Thread)
 		newPost.Thread = post.Thread //COSTIL todo
 		postList = append(postList, newPost)
 
@@ -85,7 +84,7 @@ func AddNewPosts(posts []pmodel.Post, thr tmodel.Thread) ([]pmodel.Post, error) 
 }
 
 func checkIfAuthorExist(tx *sqlx.Tx, post pmodel.Post) bool {
-	_, err := repository.GetUserByNickname(post.Author)
+	_, err := repository.GetUserByNicknameWithTx(tx, post.Author)
 	if err != nil {
 		return false
 	}
