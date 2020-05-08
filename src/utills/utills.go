@@ -91,6 +91,11 @@ func StartTransaction() *sqlx.Tx {
 
 func EndTransaction(tx *sqlx.Tx) error {
 	err := tx.Commit()
+	if (err!=nil){
+		log.Error().Msgf("transaction err: ",err)
+		tx.Rollback();
+
+	}
 	return err
 }
 

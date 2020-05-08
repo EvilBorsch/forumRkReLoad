@@ -51,8 +51,9 @@ func PostsCreate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	newPosts, err := prepo.AddNewPosts(posts, thread)
-	fmt.Println("err posts create bottom", err)
+
 	if err != nil {
+		fmt.Println("err posts create bottom", err)
 		if err.Error() == "no thread" {
 			utills.SendServerError("no thread", http.StatusNotFound, w)
 			return

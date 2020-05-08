@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/jmoiron/sqlx"
+	"github.com/rs/zerolog/log"
 	pmodel "go-server-server-generated/src/post/models"
 	tmodel "go-server-server-generated/src/thread/models"
 	trepo "go-server-server-generated/src/thread/repository"
@@ -27,12 +28,21 @@ func UpdateForumPostsCountByThread(tx *sqlx.Tx, thread tmodel.Thread, incValue i
 	return err
 }
 
+
+func UpdateForumPostsCountByThreadWithoutTx(tx *sqlx.DB, thread tmodel.Thread, incValue int) error {
+	forumSlug := thread.Forum
+	finalQuery := `UPDATE forum SET posts=posts+$1 where slug=$2`
+	_, err := tx.Exec(finalQuery, incValue, forumSlug)
+	return err
+}
+
 func CheckIfParentPostsInSameThread(tx *sqlx.Tx, post pmodel.Post) bool {
 	if post.Parent == nil {
 		return true
 	}
 	parentPost, err := GetPostById(tx, post.Parent)
 	if err != nil {
+		fmt.Println("err when check parent: ",err)
 		return false
 	}
 	return parentPost.Thread == post.Thread
@@ -49,8 +59,7 @@ func AddNewPosts(posts []pmodel.Post, thr tmodel.Thread) ([]pmodel.Post, error) 
 	timeCreated := time.Now().UTC()
 	finalQuery := `INSERT INTO posts (author, created, forum, isedited, message, parent, thread) VALUES ($1,$2,$3,$4,$5,NULLIF($6,0),$7) returning *`
 	conn := utills.GetConnection()
-	tx := conn.MustBegin()
-	defer tx.Commit()
+
 	var postList []pmodel.Post
 	var err error
 	thread := thr
@@ -61,31 +70,33 @@ func AddNewPosts(posts []pmodel.Post, thr tmodel.Thread) ([]pmodel.Post, error) 
 		post.Thread = thread.Id
 		post.IsEdited = false
 
-		ok := checkIfAuthorExist(tx, post)
+		ok := checkIfAuthorExist(post)
 		if !ok {
+			fmt.Println("not ok author",post)
 			errMsg := "Can't find post author by nickname: " + post.Author
 			return nil, errors.New(errMsg)
 		}
-		ok = CheckIfParentPostsInSameThread(tx, post)
-		if !ok {
-			return nil, errors.New("no parent")
-		}
 
 		var newPost pmodel.Post
-		tx.Get(&newPost, finalQuery, post.Author, post.Created, post.Forum, post.IsEdited, post.Message, post.Parent, post.Thread)
+		err:=conn.Get(&newPost, finalQuery, post.Author, post.Created, post.Forum, post.IsEdited, post.Message, post.Parent, post.Thread)
+		if (err!=nil){
+			log.Error().Msgf("error wen add posts when get",err)
+			return nil,errors.New("no parent")
+		}
 		newPost.Thread = post.Thread //COSTIL todo
 		postList = append(postList, newPost)
 
 	}
 
-	err = UpdateForumPostsCountByThread(tx, thread, len(postList))
+	err = UpdateForumPostsCountByThreadWithoutTx(conn, thread, len(postList))
 
 	return postList, err
 }
 
-func checkIfAuthorExist(tx *sqlx.Tx, post pmodel.Post) bool {
-	_, err := repository.GetUserByNicknameWithTx(tx, post.Author)
+func checkIfAuthorExist(post pmodel.Post) bool {
+	_, err := repository.GetUserByNickname(post.Author)
 	if err != nil {
+		fmt.Println("err when check ",err)
 		return false
 	}
 	return true
