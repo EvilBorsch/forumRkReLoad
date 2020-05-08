@@ -127,6 +127,7 @@ func GetPosts(w http.ResponseWriter, r *http.Request) {
 		utills.SendOKAnswer(emptyPost, w)
 		return
 	}
+	fmt.Println("len posts", len(posts))
 	utills.SendOKAnswer(posts, w)
 	return
 

@@ -77,6 +77,7 @@ func ForumGetThreads(w http.ResponseWriter, r *http.Request) {
 		utills.SendServerError("Can't find forum by slug: "+slug, http.StatusNotFound, w)
 		return
 	}
+	fmt.Println("len threads", len(threads))
 	utills.SendOKAnswer(threads, w)
 }
 
@@ -97,5 +98,6 @@ func GetForumUsers(w http.ResponseWriter, r *http.Request) {
 		utills.SendOKAnswer(empt, w)
 		return
 	}
+	fmt.Println("len ", len(users))
 	utills.SendOKAnswer(users, w)
 }
