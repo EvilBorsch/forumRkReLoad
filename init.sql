@@ -86,33 +86,22 @@ execute procedure parents_change();
 
 CREATE INDEX on votes(nickname,threadID);
 
--- --
--- -- create index if not exists idx_forum_user on forum (user_nickname);
--- --
--- --
---
+
+
+CREATE INDEX forum_slug_idx ON forum (slug);
+CREATE INDEX users_nick_idx ON "user" (nickname);
+
+CREATE INDEX fpi_idx ON posts ((posts.parents[1]), thread);
+CREATE INDEX pid_idx ON posts ((posts.parents[1]), id);
+CREATE INDEX parents_idx ON posts ((posts.parents[1]));
+CREATE INDEX thread_idx ON posts (thread);
+CREATE INDEX pare_idx ON posts ((posts.parent));
+
 create index if not exists slug_id on threads (slug);
--- -- create index if not exists f_created_idx on threads (forum, created);
--- -- create index if not exists t_author_idx on threads (author, forum);
--- --
---
---
-create index if not exists slug_id_author on threads (author);
-create index if not exists t_a_f on threads(author,forum);
+create index if not exists f_created_idx on threads (forum, created);
+create index if not exists t_author_idx on threads (author, forum);
 
 
-create index if not exists p_id on posts(thread);
-create index if not exists p_parents on posts(parents);
-create index if not exists p_parent on posts(parent);
---
--- create index if not exists path_id_idx on posts (id, (parents [1]));
--- create index if not exists posts_path_id on posts (parents);
--- create index if not exists thread_id_idx on posts (thread, id);
--- create index if not exists thread_post_id on posts (thread);
--- create index if not exists post_path_2_id on posts ((parents [1]));
--- create index if not exists thread_id_parents_parent on posts (thread, id, (parents[1]), parent);
--- create index if not exists author_forum_idx on posts (author, forum);
--- create index if not exists thread_parents_id_idx on posts (thread, parents, id);
 
 
 CREATE TABLE forum_user
