@@ -115,3 +115,36 @@ create index if not exists p_parent on posts(parent);
 -- create index if not exists thread_parents_id_idx on posts (thread, parents, id);
 
 
+CREATE TABLE forum_user
+(
+    user_nickname citext NOT NULL,
+    forum_slug    citext NOT NULL,
+    FOREIGN KEY (user_nickname) REFERENCES "user" (nickname),
+    FOREIGN KEY (forum_slug) REFERENCES forum (Slug),
+    UNIQUE (user_nickname, forum_slug)
+);
+
+CREATE OR REPLACE FUNCTION uForum_updater() RETURNS TRIGGER AS
+$update_users_forum$
+BEGIN
+    INSERT INTO forum_user (user_nickname, forum_slug) VALUES (NEW.author, NEW.forum) on conflict do nothing;
+    return NEW;
+end
+$update_users_forum$ LANGUAGE plpgsql;
+
+
+
+CREATE TRIGGER thread_insert_user_forum
+    AFTER INSERT
+    ON threads
+    FOR EACH ROW
+EXECUTE PROCEDURE uForum_updater();
+CREATE TRIGGER post_insert_user_forum
+    AFTER INSERT
+    ON posts
+    FOR EACH ROW
+EXECUTE PROCEDURE uForum_updater();
+
+
+CREATE INDEX forum_user_index ON forum_user (forum_slug, lower(user_nickname));
+

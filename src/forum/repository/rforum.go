@@ -9,7 +9,6 @@ import (
 	swagger "go-server-server-generated/src/user/models"
 	urepo "go-server-server-generated/src/user/repository"
 	"go-server-server-generated/src/utills"
-	"time"
 )
 
 func CreateForum(forum fmodel.Forum) (fmodel.Forum, error) {
@@ -43,10 +42,7 @@ func GetThreadsByForumSlug(forumSlug string, isDesc string, limit string, since 
 		return []tmodel.Thread{}, nil, false
 	}
 	if since != "" {
-		layout := "2006-01-02T15:04:05.000Z"
-		t, _ := time.Parse(layout, since)
-		t = t.UTC().Local()
-		tString := "'" + t.String()[:23] + "'"
+		tString := "'" + since + "'"
 
 		query = `SELECT * from threads where forum=$1 and created<=` + tString + ` ORDER BY created`
 		if isDesc == "false" || isDesc == "" {
@@ -86,19 +82,14 @@ func GetForumUsers(forumSlug string, isDesc string, limit string, since string) 
 		return nil, errors.New("forum not found")
 	}
 	var queryFinal string
-	query := `Select distinct u.nickname, fullname,about,email
-from threads
-         join posts p on threads.id = p.thread
-         join "user" u on (p.author = u.nickname or threads.author = u.nickname)
-where ( (threads.forum=$1 or p.forum=$1) `
-	queryFinal = query
-	strOrder := "order by u.nickname " + isDesc + " LIMIT " + limit
+	queryFinal = `Select nickname, fullname, about, email from forum_user 
+join "user" on lower(forum_user.user_nickname) = lower("user".nickname) 
+where forum_slug=$1`
+	strOrder := " order by nickname " + isDesc + " LIMIT " + limit
 	if isDesc == "DESC" && since != "" {
-		queryFinal = queryFinal + "and lower(u.nickname)<lower($2)) "
+		queryFinal = queryFinal + "and lower(nickname)<lower($2) "
 	} else if isDesc == "ASC" && since != "" {
-		queryFinal = queryFinal + "and lower(u.nickname)>lower($2)) "
-	} else if since == "" {
-		queryFinal = queryFinal + ") "
+		queryFinal = queryFinal + "and lower(nickname)>lower($2) "
 	}
 	queryFinal = queryFinal + strOrder
 	tx := utills.StartTransaction()
@@ -110,7 +101,6 @@ where ( (threads.forum=$1 or p.forum=$1) `
 		return users, err
 	}
 	err = tx.Select(&users, queryFinal, forumSlug)
-	users = appendUserWhoVote(tx, users, forumSlug)
 	return users, err
 }
 
