@@ -3,7 +3,6 @@ package repository
 import (
 	"errors"
 	"fmt"
-	"github.com/jmoiron/sqlx"
 	fmodel "go-server-server-generated/src/forum/models"
 	tmodel "go-server-server-generated/src/thread/models"
 	swagger "go-server-server-generated/src/user/models"
