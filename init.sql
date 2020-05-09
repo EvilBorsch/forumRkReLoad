@@ -90,10 +90,15 @@ CREATE INDEX on votes(nickname,threadID);
 
 CREATE INDEX forum_slug_idx ON forum (slug);
 CREATE INDEX users_nick_idx ON "user" (nickname);
+CREATE INDEX users_nick_email_idx ON "user" (nickname,email); --delete if not work
+CREATE INDEX users_email_idx ON "user" (email); --delete if not work
+
+
 
 CREATE INDEX fpi_idx ON posts ((posts.parents[1]), thread);
 CREATE INDEX pid_idx ON posts ((posts.parents[1]), id);
 CREATE INDEX parents_idx ON posts ((posts.parents[1]));
+CREATE INDEX parents_all_idx ON posts ((posts.parents)); --delete if not work
 CREATE INDEX thread_idx ON posts (thread);
 CREATE INDEX pare_idx ON posts ((posts.parent));
 

@@ -104,19 +104,3 @@ where forum_slug=$1`
 	return users, err
 }
 
-func appendUserWhoVote(tx *sqlx.Tx, users []swagger.User, forumSlug string) []swagger.User {
-	query := `Select distinct u.nickname, fullname,about,email
-from votes
-         join threads t on votes.threadID=t.id
-         join "user" u on t.author = u.nickname
-		 where forum=$1`
-	var usersNew []swagger.User
-	err := tx.Select(&usersNew, query, forumSlug)
-	if err != nil {
-		return users
-	}
-	for _, usr := range usersNew {
-		users = append(users, usr)
-	}
-	return users
-}
