@@ -91,7 +91,7 @@ CREATE INDEX on votes(nickname,threadID);
 CREATE INDEX forum_slug_idx ON forum (slug);
 CREATE INDEX users_nick_idx ON "user" (nickname);
 CREATE INDEX users_nick_lower_idx ON "user" (lower(nickname)); --delete if not work
-CREATE INDEX users_nick_email_idx ON "user" (nickname,email); --delete if not work
+-- CREATE INDEX users_nick_email_idx ON "user" (nickname,email); --delete if not work
 CREATE INDEX users_email_idx ON "user" (email); --delete if not work
 
 
@@ -105,7 +105,7 @@ CREATE INDEX pare_idx ON posts ((posts.parent));
 
 create index if not exists slug_id on threads (slug);
 create index if not exists f_created_idx on threads (forum, created);
-create index if not exists t_author_idx on threads (author, forum);
+-- create index if not exists t_author_idx on threads (author, forum);
 
 
 
