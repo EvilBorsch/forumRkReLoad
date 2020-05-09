@@ -92,7 +92,7 @@ CREATE INDEX forum_slug_idx ON forum (slug);
 CREATE INDEX users_nick_idx ON "user" (nickname);
 CREATE INDEX users_nick_lower_idx ON "user" (lower(nickname)); --delete if not work
 -- CREATE INDEX users_nick_email_idx ON "user" (nickname,email); --delete if not work
-CREATE INDEX users_email_idx ON "user" (email); --delete if not work
+-- CREATE INDEX users_email_idx ON "user" (email); --delete if not work
 
 
 
